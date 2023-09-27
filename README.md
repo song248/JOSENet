@@ -1,1 +1,2 @@
-# JOSENet
+# JOSENet: A Joint Stream Embedding Network for Violence Detection in Surveillance Videos
+Josenet: Official Pytorch implementation for "JOSENet: A Joint Stream Embedding Network for Violence Detection in Surveillance Videos" *(paper under review)*
