@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import numpy as np
 
@@ -17,7 +18,29 @@ import albumentations as A
 import os
 import random
 from collections import OrderedDict
+import yaml
 
+
+import utils
+import preprocessing as pre
+import architectures
+from roi import *
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='roi demo') 
+
+    parser.add_argument('--model_name', default='model_ssl', type=str, help='name of the model/experiment') 
+    parser.add_argument('--task', default="VICReg", type=str, help='ssl task: ["O3D", "AoT", "CubicPuzzle", "VICRegSiamese", "VICRegSiameseFlow", "VICReg"]') 
+    parser.add_argument('--dataset', default="UCFCrime", type=str, help='pretraining dataset ["HMDB51", "UCF101", "UCFCrime"]') 
+    parser.add_argument('--clip_frames', default=16, type=int, help='number of frames per segment (Set 128 for "CubicPuzzle", 32 for "AoT" and 16 for "O3D")') 
+    parser.add_argument('--eval', action=argparse.BooleanOptionalAction)
+
+    parsed_args = parser.parse_args()
+        
+    return parsed_args
+
+parsed_args = parse_args()
 
 is_cuda = torch.cuda.is_available()
 
@@ -34,17 +57,40 @@ torch.manual_seed(8)
 random.seed(8)
 
 
+class ConfigObject:
+    def __init__(self, dictionary):
+        self.__dict__ = dictionary
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join("config/", config_name)) as file:
+        config = yaml.safe_load(file)
+
+    return config
+
+args = load_config("primary.yaml")
+args = ConfigObject(args)
+
+# Adding parsed_args parameters
+args.model_name              = parsed_args.model_name
+args.task                    = parsed_args.task
+args.dataset                 = parsed_args.dataset
+args.clip_frames             = parsed_args.clip_frames
+args.eval                    = parsed_args.eval
+args.device                  = device
+
+
+"""
 class Set_Parameters():
-    model_name              = "model_RGB_FLOW_VICReg_IJK" 
-    task                    = "VICReg" # ["Odd", "AoT", "CubicPuzzle", "VICRegSiamese", "VICRegSiameseFlow", "VICReg"]
-    dataset                 = "HMDB51"# ["HMDB51", "UCF101", "UCFCrime"]
-    eval                    = False
+    model_name              = parsed_args.model_name
+    task                    = parsed_args.task 
+    dataset                 = parsed_args.dataset 
+    eval                    = parsed_args.eval
     mixed_precision         = True
-    clip_frames             = 16      # Set 128 for "CubicPuzzle", 32 for "AoT" and 16 for "Odd"
-    n_outputs               = 6
+    clip_frames             = parsed_args.clip_frames 
     interval                = 1       # Used for UCF-Crime
     fps                     = 7.5
-    expander_dimensionality = 8192    #8192    # Used for VICReg
+    expander_dimensionality = 8192    # 8192    # Used for VICReg
     expander_input_dim      = 864
     batch_size              = 64
     lr                      = 0.02
@@ -62,7 +108,7 @@ class Set_Parameters():
     
     device                  = device
 args = Set_Parameters()
-
+"""
 
 class Paths():
     main_folder         = "main"
@@ -70,12 +116,6 @@ class Paths():
     models              = "models/self_supervised" #=models_self_supervised
 paths = Paths()
 
-
-import sys
-import utils
-import preprocessing as pre
-import architectures
-from roi import *
 
 
 
@@ -783,7 +823,7 @@ class VICReg():
             return item
         
 
-if (args.task == "Odd"):
+if (args.task == "O3D"):
     task = OddOneOut()
 elif (args.task == "AoT"):
     task = ArrowOfTime()
@@ -809,9 +849,9 @@ val_loader = DataLoader(task.Create_Dataset(x_val, y_val, args, preprocess, augm
 task.Create_Dataset(x_val, y_val, args, preprocess, augm=augm).__getitem__(0)['label']
 
 
-if (args.task == "Odd"):
+if (args.task == "O3D"):
     model_rgb = architectures.FGN_RGB(args)
-    model = architectures.Odd_One_Out(model_rgb)
+    model = architectures.Odd_One_Out(args, model_rgb)
 
 elif (args.task == "AoT"):
     model_flow = architectures.FGN_FLOW(args)

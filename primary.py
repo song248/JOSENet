@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import numpy as np
 from tqdm import tqdm
@@ -14,6 +15,30 @@ from torch.utils.data import Dataset, DataLoader
 import albumentations as A
 import os
 import random
+import yaml
+
+import utils
+from roi import *
+import preprocessing as pre
+import architectures
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='roi demo') 
+
+    parser.add_argument('--model_name', default='model_primary', type=str, help='Name of the model/experiment') 
+    parser.add_argument('--model_ssl_rgb', default=None, type=str, help='Pretrained model name for rgb branch') 
+    parser.add_argument('--model_ssl_flow', default=None, type=str, help='Pretrained model name for rgb branch') 
+    parser.add_argument('--model_ssl_rgb_flow', default=None, type=str, help='Pretrained model name for rgb and flow branch') 
+    parser.add_argument('--clip_frames', default=16, type=int, help='Number of frames to consider for each prediction') 
+    parser.add_argument('--eval', action=argparse.BooleanOptionalAction)
+
+    parsed_args = parser.parse_args()
+
+    assert not ((parsed_args.model_ssl_rgb or parsed_args.model_ssl_flow) and parsed_args.model_ssl_rgb_flow) # Cannot load pretrained weights of the same branches twice
+        
+    return parsed_args
+
+parsed_args = parse_args()
 
 
 is_cuda = torch.cuda.is_available()
@@ -32,18 +57,45 @@ random.seed(8)
 np.random.seed(8)
 
 
+
+class ConfigObject:
+    def __init__(self, dictionary):
+        self.__dict__ = dictionary
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join("config/", config_name)) as file:
+        config = yaml.safe_load(file)
+
+    return config
+
+args = load_config("primary.yaml")
+args = ConfigObject(args)
+
+# Adding parsed_args parameters
+args.model_name              = parsed_args.model_name
+args.model_self_supervised   = {"rgb": parsed_args.model_ssl_rgb, 
+                            "flow": parsed_args.model_ssl_flow, 
+                            "rgb_and_flow": parsed_args.model_ssl_rgb_flow} 
+args.clip_frames             = parsed_args.clip_frames
+args.eval                    = parsed_args.eval
+args.device                  = device
+
+"""
 class Set_Parameters():
-    model_name          = "model_XYZ"
-    model_self_supervised = {"rgb": None, "flow": None, "rgb_and_flow": None} #None # "model_RGB_FLOW_VICReg_IJK"
-    eval                = False
+    model_name          = parsed_args.model_name #"model_XYZ"
+    model_self_supervised = {"rgb": parsed_args.model_ssl_rgb, 
+                             "flow": parsed_args.model_ssl_flow, 
+                             "rgb_and_flow": parsed_args.model_ssl_rgb_flow} #None # "model_RGB_FLOW_VICReg_IJK"
+    eval                = parsed_args.eval
     coclr               = False
     mixed_precision     = True
-    clip_frames         = 16 # Number of frames to consider for each prediction
+    clip_frames         = parsed_args.clip_frames # Number of frames to consider for each prediction
     interval            = 4
     batch_size          = 32
     dropout             = 0.2 
     dropout3d           = 0.2 #0.2
-    epochs              = 1 #30
+    epochs              = 30
     patience            = 15 # Number of epochs without improvement to tolerate
     
     lr                  = 0.01
@@ -59,7 +111,7 @@ class Set_Parameters():
     fps                 = 7.5
 
 args = Set_Parameters()
-
+"""
 
 class Paths():
     jpg_frames             = "datasets/RWF-2000_frames"
@@ -68,12 +120,6 @@ class Paths():
 paths = Paths()
 
 
-import sys
-import utils
-from roi import *
-import preprocessing as pre
-import architectures
-
 n_of_frames = 16
    
 if(args.dataset == "RWF-2000"):
@@ -81,11 +127,7 @@ if(args.dataset == "RWF-2000"):
     x_train = segments['train']
     train_labels = labels['train']
     x_val = segments['val']
-    val_labels = labels['val']
-
-    #x_val, x_test, y_val, y_test = train_test_split(segments['val'], labels['val'], test_size=0.5, random_state=3, stratify=labels['val']) 
-    print (x_train[0][0])
-    print (x_val[0][0])    
+    val_labels = labels['val'] 
 
 
 class Augmentation():    

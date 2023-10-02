@@ -476,7 +476,7 @@ class FGN(nn.Module):
     
 ########################################### SELF-SUPERVISED ARCHITECTURES ###################################
 class Odd_One_Out(nn.Module):
-    def __init__(self, model):
+    def __init__(self, args, model):
         super(Odd_One_Out, self).__init__()
         self.model = model
         self.avgpool = nn.AvgPool3d(kernel_size=(9, 7, 7))
@@ -484,7 +484,7 @@ class Odd_One_Out(nn.Module):
         # Classifier
         self.fc1 = nn.Linear(128,128)
         self.fc2 = nn.Linear(128, 32)
-        self.fc3 = nn.Linear(32, args.n_outputs)
+        self.fc3 = nn.Linear(32, 6)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(args.dropout)
         
@@ -560,7 +560,7 @@ class Cubic_Puzzle(nn.Module):
         super(Cubic_Puzzle, self).__init__()
         self.model = model
         self.avgpool = nn.AvgPool3d(kernel_size=(4, 2, 2))
-        self.fc1 = nn.Linear(2048, args.n_outputs)
+        self.fc1 = nn.Linear(2048, 24)
         self.relu = nn.ReLU(inplace=True)
         
     def forward(self, questions):

@@ -14,17 +14,18 @@ Another possibility is to directly install the Anaconda environment:
 - `conda activate josenet`
 
 
-## Training: supervised learning without SSL pretraining 🎯
-1. `python supervised.py` with `eval=False`
+## Training 📉
+Hyperparameters for both auxiliary and primary task can be found respectively in `config/auxiliary.yaml` and `config/primary.yaml`. All the models generated in the target task training are saved in `models/primary`, while the intermediate pretrained models are placed inside `models/auxiliary` folder.
 
-## Training: SSL pretraining + Supervised learning 🧩📉
-1. `python self_supervised.py` with `eval=False` will produce a model (e.g. `model_RGB_FLOW_VICReg_IJK`)
-2. `python supervised.py` with `eval=False` and `model_self_supervised["rgb_and_flow"]='model_RGB_FLOW_VICReg_IJK'`
+### Primary Task (without SSL pretraining) 🎯
+1. `python primary.py`
 
+### Auxiliary SSL Task + Primary Task 🧩
+1. `python auxiliary.py --model_name model_ssl`
+2. `python primary.py --model_name=model_primary --model_ssl_rgb_flow model_ssl`
 
 ## Evaluation 📊
-All the models generated in the previous training phase can be found in `models/supervised`. For a model called `model_XYZ`:
-1. `python supervised.py` with `eval=False` and `model_name=model_XYZ`
+1. `python primary.py --eval --model_name=model_primary`
 
 ## Datasets 📁
 
