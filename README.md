@@ -18,7 +18,7 @@ Another possibility is to directly install the Anaconda environment:
 Hyperparameters for both auxiliary and primary task can be found respectively in `config/auxiliary.yaml` and `config/primary.yaml`. All the models generated in the target task training are saved in `models/primary`, while the intermediate pretrained models are placed inside `models/auxiliary` folder.
 
 ### Primary Task (without SSL pretraining) 🎯
-1. `python primary.py`
+1. `python primary.py --model_name model_primary`
 
 ### Auxiliary SSL Task + Primary Task 🧩
 1. `python auxiliary.py --model_name model_ssl`
