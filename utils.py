@@ -31,7 +31,9 @@ def plot_loss_function (args, paths, train_loss_tot, valid_loss_tot, epoch, save
     plt.legend(loc="upper right")
     #plt.plot()
     if (save):
-        plt.savefig(os.path.join('results','loss',args.model_name+'.jpg'), format='jpg', dpi=600)
+        path = os.path.join("results","loss")
+        if not os.path.exists(path): os.makedirs(path)
+        plt.savefig(os.path.join(path, args.model_name+'.jpg'), format='jpg', dpi=600)
 
 def plot_confusion_matrix (args, paths, test_true, test_pred, save=True):
     print (test_true)
@@ -43,7 +45,9 @@ def plot_confusion_matrix (args, paths, test_true, test_pred, save=True):
     svm = sn.heatmap(df_cm, annot=True)
     figure = svm.get_figure() 
     if (save):
-        plt.savefig(os.path.join('results','confusion',args.model_name+'.jpg'), format='jpg', dpi=600)
+        path = os.path.join("results","confusion")
+        if not os.path.exists(path): os.makedirs(path)
+        plt.savefig(os.path.join(path, args.model_name+'.jpg'), format='jpg', dpi=600)
 
 def plot_roc_curve (args, paths, test_true, test_probs, save=True):
     # ROC curve
@@ -68,7 +72,9 @@ def plot_roc_curve (args, paths, test_true, test_probs, save=True):
     #plt.plot()
     # Save to local and then to drive
     if (save):
-        plt.savefig(os.path.join('results','roc',args.model_name+'.jpg'), format='jpg', dpi=600)
+        path = os.path.join("results","roc")
+        if not os.path.exists(path): os.makedirs(path)
+        plt.savefig(os.path.join(path, args.model_name+'.jpg'), format='jpg', dpi=600)
     
     
 def weighted_loss(pred, gold, lab0_count, lab1_count, device):

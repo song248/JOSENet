@@ -113,7 +113,7 @@ args = Set_Parameters()
 class Paths():
     main_folder         = "main"
     jpg_frames          = "ucf_crime_jpg_frames"
-    models              = "models/self_supervised" #=models_self_supervised
+    models              = "models/auxiliary" #
 paths = Paths()
 
 
@@ -1033,6 +1033,7 @@ if (not args.eval and not "VICReg" in args.task):
             metric = val_f1
             if metric >= best_metric:
                 best_metric = metric
+                if not os.path.exists(paths.models): os.makedirs(paths.models)
                 torch.save(model.state_dict(), os.path.join(paths.models, args.model_name+".pt"))
                 print('----- Model saved -----')
             if (best_val_loss is None or val_loss < best_val_loss):
@@ -1188,6 +1189,7 @@ if (not args.eval and "VICReg" in args.task):
             for name, param in model.named_parameters():
                 if ("model" in name or "block" in name):
                     param_to_save [name] = param
+            if not os.path.exists(paths.models): os.makedirs(paths.models)
             torch.save(param_to_save, os.path.join(paths.models, args.model_name+".pt"))
             print('----- Model saved -----')
         
@@ -1200,7 +1202,7 @@ if (not args.eval and "VICReg" in args.task):
             print ("----- Early stopping -----")
             break  
         
-        
+        """
         state = dict(
                 epoch=epoch+1,
                 model=model.state_dict(),
@@ -1211,8 +1213,9 @@ if (not args.eval and "VICReg" in args.task):
                 best_train_loss = best_train_loss,
                 train_loss_tot=train_loss_tot
             )
+        if not os.path.exists(paths.models): os.makedirs(paths.models)
         torch.save(state, os.path.join(paths.models, args.model_name+'.pth'))
-            
+        """
     #utils.plot_loss_function(args, paths, train_loss_tot, valid_loss_tot, epoch-1)
     print('--- End ---')
 else:

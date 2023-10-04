@@ -115,8 +115,8 @@ args = Set_Parameters()
 
 class Paths():
     jpg_frames             = "datasets/RWF-2000_frames"
-    models                 = "models/supervised"
-    models_self_supervised = "models/self_supervised"
+    models                 = "models/primary"
+    models_self_supervised = "models/auxiliary"
 paths = Paths()
 
 
@@ -622,6 +622,7 @@ if (not args.eval):
             metric = val_f1 #val_acc for action recognition
             if metric >= best_metric:
                 best_metric = metric
+                if not os.path.exists(paths.models): os.makedirs(paths.models)
                 torch.save(model.state_dict(), os.path.join(paths.models, args.model_name+".pt"))
                 print('----- Model saved -----')
             if (best_val_loss is None or val_loss < best_val_loss):
