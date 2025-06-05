@@ -68,7 +68,7 @@ def load_config(config_name):
 
     return config
 
-args = load_config("primary.yaml")
+args = load_config("auxiliary.yaml")
 args = ConfigObject(args)
 
 # Adding parsed_args parameters
