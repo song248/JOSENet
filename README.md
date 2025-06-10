@@ -15,6 +15,12 @@ Another possibility is to directly install the Anaconda environment:
 ## Training 📉
 Hyperparameters for both auxiliary and primary task can be found respectively in `config/auxiliary.yaml` and `config/primary.yaml`. All the models generated in the target task training are saved in `models/primary`, while the intermediate pretrained models are placed inside `models/auxiliary` folder.
 
+## Datasets 📁
+- RWF-2000: [Box Drive](https://duke.app.box.com/s/kfgnl5bfy7w75cngopskms8kbh5w1mvu), unzip and run `python tools/rwf_2000_dataset_creation.py` <- This second
+- HMDB51: run `python tools/hmdb51_download.py` <- This first
+- UCF101: run `python tools/ucf101_download.py`
+- UCF-Crime: [Dropbox](https://www.dropbox.com/sh/75v5ehq4cdg5g5g/AABvnJSwZI7zXb8_myBA0CLHa?dl=0), unrar and run `python tools/ucf_crime_dataset_creation.py`
+
 ### Primary Task (without SSL pretraining) 🎯
 1. `python primary.py --model_name model_primary`
 
@@ -25,8 +31,5 @@ Hyperparameters for both auxiliary and primary task can be found respectively in
 ## Evaluation 📊
 1. `python primary.py --eval --model_name=model_primary`
 
-## Datasets 📁
-- RWF-2000: [Box Drive](https://duke.app.box.com/s/kfgnl5bfy7w75cngopskms8kbh5w1mvu), unzip and run `python tools/rwf_2000_dataset_creation.py`
-- HMDB51: run `python tools/hmdb51_download.py`
-- UCF101: run `python tools/ucf101_download.py`
-- UCF-Crime: [Dropbox](https://www.dropbox.com/sh/75v5ehq4cdg5g5g/AABvnJSwZI7zXb8_myBA0CLHa?dl=0), unrar and run `python tools/ucf_crime_dataset_creation.py`
+## Inference
+1. `python infer.py`
